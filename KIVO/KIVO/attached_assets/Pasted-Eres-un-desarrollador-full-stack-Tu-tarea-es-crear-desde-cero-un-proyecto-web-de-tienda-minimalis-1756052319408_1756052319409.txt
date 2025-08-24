@@ -1,0 +1,70 @@
+Eres un desarrollador full-stack. Tu tarea es crear desde cero un proyecto web de tienda **minimalista** y **robusto** que cumpla los siguientes requisitos técnicos, de seguridad y de arquitectura. Entrega código claro, compacto y modular, pensado para un estudiante de informática (4º semestre) que quiere aprender y desplegar rápido usando Supabase (versión free por ahora) y Render/Vercel. Prioriza el patrón **MVC** (Model-View-Controller), pocas carpetas y archivos cortos pero funcionales.
+
+Objetivos principales:
+1. Implementar autenticación con **Supabase Auth** (email/password) y almacenar datos de usuario en la tabla `profiles` que incluya `auth_uid`, `email`, `phone`, `is_admin`, `created_at`.
+2. Crear una **zona cliente** (catálogo, vista producto) y una **zona administrativa** donde un admin pueda gestionar productos y promociones (crear/editar/eliminar).
+3. Promociones: deben tener `title`, `product_id`, `discount_percent`, `starts_at`, `ends_at`, `created_by`, `created_at` y un campo calculado `active` (evaluado por el servidor/DB con `timestamptz` para evitar "hora congelada").
+4. Validación de seguridad: las rutas admin deben exigir un JWT (`Authorization: Bearer <token>`). El servidor valida el token con `supabase.auth.getUser(token)` y verifica `is_admin` en `profiles`.
+5. Separar cliente y servidor keys: **nunca** exponer `SUPABASE_SERVICE_ROLE_KEY` en el frontend. Usar `anon key` en cliente para iniciar sesión y obtener token; el servidor utilizará `service_role` (solo en variables de entorno) para operaciones administrativas que lo requieran.
+6. Diseñar la app para desplegar en **Render** (backend Express + EJS) y dejar instrucciones claras para migrar a **Next.js / Vercel** si se desea más adelante.
+7. Hacer todo lo más compacto posible: pocas carpetas (`models/`, `controllers/`, `views/`, `lib/`), archivos cortos y comentados. Código legible para quien está aprendiendo.
+
+Requisitos funcionales mínimos:
+- Registro / login con Supabase Auth (email + password).
+- Página principal lista productos y enlaces a vista de producto.
+- API pública para listar productos (`GET /api/products`).
+- Interfaz admin (`/admin`) que permite crear promociones. El formulario admin en frontend obtiene sesión con supabase-js y envía token Bearer al backend.
+- Endpoints protegidos:
+  - `POST /api/admin/promotion` — crear promoción (requiere admin).
+  - `PUT /api/admin/promotion/:id` — actualizar promoción (requiere admin).
+- Soporte para `phone` en el perfil; admin puede editar/establecer número en `profiles`.
+- Tiempos y fechas en `timestamptz`, comparación hecha en DB o servidor para decidir si una promoción está activa.
+
+Requisitos técnicos / stack:
+- Node.js (18+) + Express
+- EJS para vistas (simplicidad)
+- `@supabase/supabase-js` en cliente y servidor
+- Estructura MVC: `models/`, `controllers/`, `views/`, `lib/`
+- Archivo `lib/supabase.js` que exporte dos clientes: `supabase` (anon) y `supabaseAdmin` (service_role si existe).
+- Variables de entorno requeridas: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (solo server), `PORT`.
+- Garantizar que `SUPABASE_SERVICE_ROLE_KEY` no se suba al repo y solo exista en Render/Vercel env vars.
+
+Recomendaciones de DB (para ejecutar en Supabase SQL editor):
+- Tabla `profiles` con `id uuid PK, auth_uid uuid unique, email, phone, is_admin boolean default false, created_at timestamptz default now()`.
+- Tabla `products` con `id, name, description, price numeric(10,2), stock int, created_at, updated_at`.
+- Tabla `promotions` con `id, title, product_id references products(id), discount_percent int check 0..100, starts_at timestamptz, ends_at timestamptz, created_by uuid references profiles(id), created_at timestamptz default now(), active generated as (now() between starts_at and ends_at) stored`.
+- Sugerir activar Row Level Security (RLS) y políticas cuando estés listo para producción (incluir instrucciones en README).
+
+Entregables que debe producir el desarrollador:
+1. Prompt de proyecto (este mismo).
+2. Estructura mínima de archivos (árbol del proyecto).
+3. Código base funcional y compacto: `server.js`, `lib/supabase.js`, `models/products.js`, `models/promotions.js`, `controllers/shopController.js`, `controllers/adminController.js`, vistas EJS (`index.ejs`, `product.ejs`, `admin.ejs`), `package.json`.
+4. SQL para crear las tablas mencionadas.
+5. README completo con:
+   - Variables de entorno.
+   - Pasos para ejecutar local (`npm install`, `.env`, `npm run dev`).
+   - Cómo crear admin (insertar `profiles` con `is_admin=true` o trigger que vincule `auth.uid` al registro).
+   - Cómo desplegar en Render (configurar env vars) y notas para migrar a Vercel/Next.js.
+   - Buenas prácticas de seguridad (no exponer service_role, activar RLS, validar tokens).
+6. Código ejemplo de validación server-side de token usando `supabase.auth.getUser(token)` y comprobación de `is_admin` en `profiles`.
+7. Ejemplo del formulario admin que usa `@supabase/supabase-js` en frontend (anon key), toma la sesión y envía token Bearer al backend.
+8. Notas sobre por qué el proyecto anterior pudo fallar (ej.: keys expuestas, falta de validación JWT server-side, timestamps mal manejados, ausencia de admin route, estructura monolítica), y cómo esta nueva estructura soluciona esos problemas.
+
+Restricciones y criterios de aceptación:
+- Todo el código debe ser funcional y probarse localmente con la configuración mínima.
+- El frontend no debe contener el `service_role` key bajo ninguna circunstancia.
+- Las rutas admin deben devolver 401/403 cuando token inválido o usuario no admin.
+- Mantener el proyecto en pocas carpetas y archivos cortos; priorizar claridad sobre optimizaciones prematuras.
+- Incluir comentarios cortos en código que expliquen la intención para un estudiante.
+
+Tareas opcionales (si hay tiempo/quieres extender):
+- Endpoint para sincronizar `profiles` al registrarse (trigger o webhook) para que `auth_uid` se inserte automáticamente.
+- Conversión de frontend a Next.js con SSR y supabase server-side session (para migración a Vercel).
+- Añadir tests básicos (jest/supertest) para endpoints admin.
+
+Entrega final:
+- Un repositorio con la estructura solicitada y README, o un ZIP con los archivos.
+- Instrucciones paso a paso para que yo (cliente) pueda desplegar en Render y conectar mi proyecto Supabase free.
+- Si necesitas, genera comandos concretos para transformar mi repo actual `ivan22102000/kivo_tienda` a esta nueva estructura.
+
+Fin del prompt. Actúa ahora creando el proyecto y los archivos, o dame los archivos listos para que yo los suba a mi GitHub. Prioriza que el código sea apto para desplegar en Render y compatible con una migración futura a Vercel/Next.js.

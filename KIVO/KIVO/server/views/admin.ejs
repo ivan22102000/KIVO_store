@@ -1,0 +1,649 @@
+<% 
+// Set page context for navigation
+let page = 'admin';
+let description = 'Dashboard administrativo con métricas en tiempo real, gestión de productos y promociones';
+%>
+
+<!-- Admin Dashboard Section -->
+<section class="py-5 mt-5">
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="admin-title" data-testid="text-admin-title">Dashboard Administrativo</h1>
+                    <p class="mb-0 fs-5" data-testid="text-admin-subtitle">Panel de control con métricas en tiempo real y gestión de contenido</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <button class="btn btn-light me-2" onclick="exportData()" data-testid="button-export-data">
+                        <i class="fas fa-download me-2"></i>Exportar Datos
+                    </button>
+                    <button class="btn btn-warning" onclick="openSettings()" data-testid="button-settings">
+                        <i class="fas fa-cog me-2"></i>Configuración
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Key Metrics -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-xl-3">
+                <div class="metric-card" data-testid="card-metric-sales">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-value" data-testid="text-metric-sales">$<%= metrics.totalSales?.toLocaleString() || '0' %></div>
+                            <div class="metric-label">Ventas Totales</div>
+                            <div class="metric-change positive">
+                                <i class="fas fa-arrow-up me-1"></i>+12.5% vs mes anterior
+                            </div>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-xl-3">
+                <div class="metric-card" data-testid="card-metric-orders">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-value" data-testid="text-metric-orders"><%= metrics.totalOrders?.toLocaleString() || '0' %></div>
+                            <div class="metric-label">Pedidos</div>
+                            <div class="metric-change positive">
+                                <i class="fas fa-arrow-up me-1"></i>+8.2% vs mes anterior
+                            </div>
+                        </div>
+                        <div class="text-success">
+                            <i class="fas fa-shopping-cart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-xl-3">
+                <div class="metric-card" data-testid="card-metric-products">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-value" data-testid="text-metric-products"><%= metrics.totalProducts || 0 %></div>
+                            <div class="metric-label">Productos Total</div>
+                            <div class="metric-change positive">
+                                <i class="fas fa-arrow-up me-1"></i>+<%= metrics.totalProducts || 0 %> productos
+                            </div>
+                        </div>
+                        <div class="text-info">
+                            <i class="fas fa-box fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-xl-3">
+                <div class="metric-card" data-testid="card-metric-promotions">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="metric-value" data-testid="text-metric-promotions"><%= metrics.totalPromotions || 0 %></div>
+                            <div class="metric-label">Promociones Activas</div>
+                            <div class="metric-change <%= metrics.totalPromotions > 0 ? 'positive' : 'neutral' %>">
+                                <i class="fas fa-tag me-1"></i><%= metrics.totalPromotions || 0 %> promociones
+                            </div>
+                        </div>
+                        <div class="text-warning">
+                            <i class="fas fa-percentage fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Gauges -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="metric-card text-center" data-testid="card-gauge-server">
+                    <h5 class="mb-3">Rendimiento del Servidor</h5>
+                    <div class="gauge-container">
+                        <canvas id="serverGauge" class="gauge-canvas" width="200" height="200"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-success" data-testid="badge-server-status">Óptimo</span>
+                        <small class="text-muted d-block mt-1">CPU: 45% | RAM: 62%</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="metric-card text-center" data-testid="card-gauge-satisfaction">
+                    <h5 class="mb-3">Satisfacción del Cliente</h5>
+                    <div class="gauge-container">
+                        <canvas id="satisfactionGauge" class="gauge-canvas" width="200" height="200"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-primary" data-testid="badge-satisfaction-status">Excelente</span>
+                        <small class="text-muted d-block mt-1">4.8/5.0 estrellas promedio</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="metric-card text-center" data-testid="card-gauge-inventory">
+                    <h5 class="mb-3">Inventario Disponible</h5>
+                    <div class="gauge-container">
+                        <canvas id="inventoryGauge" class="gauge-canvas" width="200" height="200"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge <%= metrics.lowStockCount > 5 ? 'bg-danger' : metrics.lowStockCount > 0 ? 'bg-warning' : 'bg-success' %>" data-testid="badge-inventory-status">
+                            <%= metrics.lowStockCount > 5 ? 'Crítico' : metrics.lowStockCount > 0 ? 'Atención' : 'Óptimo' %>
+                        </span>
+                        <small class="text-muted d-block mt-1"><%= metrics.lowStockCount || 0 %> productos con stock bajo</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Panels -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="metric-card" data-testid="card-product-management">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Gestión de Productos</h5>
+                        <button class="btn btn-primary btn-sm" onclick="showAddProductModal()" data-testid="button-add-product">
+                            <i class="fas fa-plus me-2"></i>Nuevo Producto
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (products && products.length > 0) { %>
+                                    <% products.forEach((product) => { %>
+                                    <tr data-testid="row-product-<%= product.id %>">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <% if (product.image_url) { %>
+                                                <img src="<%= product.image_url %>" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                <% } else { %>
+                                                <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-image text-muted"></i>
+                                                </div>
+                                                <% } %>
+                                                <span data-testid="text-product-name-<%= product.id %>"><%= product.name %></span>
+                                            </div>
+                                        </td>
+                                        <td data-testid="text-product-price-<%= product.id %>">$<%= parseFloat(product.price).toLocaleString() %></td>
+                                        <td>
+                                            <span class="badge <%= product.stock > 10 ? 'bg-success' : product.stock > 0 ? 'bg-warning text-dark' : 'bg-danger' %>" 
+                                                  data-testid="badge-product-stock-<%= product.id %>">
+                                                <%= product.stock %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success" data-testid="badge-product-status-<%= product.id %>">Activo</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" onclick="editProduct(<%= product.id %>)" data-testid="button-edit-product-<%= product.id %>">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger" onclick="deleteProduct(<%= product.id %>)" data-testid="button-delete-product-<%= product.id %>">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                <tr>
+                                    <td colspan="5" class="text-center py-4" data-testid="text-no-products">
+                                        <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+                                        <br>No hay productos disponibles
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="metric-card" data-testid="card-create-promotion">
+                    <h5 class="mb-4">Crear Promoción</h5>
+                    
+                    <form id="promotionForm" data-testid="form-create-promotion">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="promoTitle" name="title" placeholder="Título de la promoción" required data-testid="input-promo-title">
+                            <label for="promoTitle">Título de la Promoción</label>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <select class="form-select" id="promoProduct" name="product_id" required data-testid="select-promo-product">
+                                <option value="">Seleccionar producto</option>
+                                <% if (products && products.length > 0) { %>
+                                    <% products.forEach((product) => { %>
+                                    <option value="<%= product.id %>"><%= product.name %></option>
+                                    <% }); %>
+                                <% } %>
+                            </select>
+                            <label for="promoProduct">Producto</label>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" id="promoDiscount" name="discount_percent" min="1" max="100" placeholder="Descuento %" required data-testid="input-promo-discount">
+                            <label for="promoDiscount">Descuento (%)</label>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-floating mb-3">
+                                    <input type="datetime-local" class="form-control" id="promoStart" name="starts_at" required data-testid="input-promo-start">
+                                    <label for="promoStart">Inicio</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-floating mb-3">
+                                    <input type="datetime-local" class="form-control" id="promoEnd" name="ends_at" required data-testid="input-promo-end">
+                                    <label for="promoEnd">Fin</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100" data-testid="button-create-promotion">
+                            <i class="fas fa-plus me-2"></i>Crear Promoción
+                        </button>
+                    </form>
+
+                    <!-- Recent Promotions -->
+                    <div class="mt-4" data-testid="div-recent-promotions">
+                        <h6 class="mb-3">Promociones Recientes</h6>
+                        <% if (promotions && promotions.length > 0) { %>
+                            <% promotions.forEach((promotion) => { %>
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom" data-testid="item-promotion-<%= promotion.id %>">
+                                <div>
+                                    <strong class="small"><%= promotion.title %></strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <%= promotion.discount_percent %>% descuento
+                                        <% if (promotion.products) { %>
+                                        en <%= promotion.products.name %>
+                                        <% } %>
+                                    </small>
+                                </div>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deletePromotion(<%= promotion.id %>)" data-testid="button-delete-promotion-<%= promotion.id %>">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <% }); %>
+                        <% } else { %>
+                        <p class="text-muted small text-center">No hay promociones recientes</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <% if (lowStockProducts && lowStockProducts.length > 0) { %>
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-warning" data-testid="alert-low-stock">
+                    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Productos con Stock Bajo</h5>
+                    <p>Los siguientes productos requieren atención inmediata:</p>
+                    <div class="row">
+                        <% lowStockProducts.forEach((product) => { %>
+                        <div class="col-md-4 mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-box text-warning me-2"></i>
+                                <strong><%= product.name %></strong>
+                                <span class="badge bg-warning text-dark ms-2">
+                                    <%= product.stock %> restantes
+                                </span>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- Add/Edit Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalTitle" data-testid="text-modal-product-title">Nuevo Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm" data-testid="form-product">
+                    <input type="hidden" id="productId" name="id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="productName" name="name" placeholder="Nombre del producto" required data-testid="input-product-name">
+                                <label for="productName">Nombre del Producto</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="productCategory" name="category" data-testid="select-product-category">
+                                    <option value="general">General</option>
+                                    <option value="electronics">Electrónicos</option>
+                                    <option value="fashion">Moda</option>
+                                    <option value="home">Hogar</option>
+                                    <option value="books">Libros</option>
+                                </select>
+                                <label for="productCategory">Categoría</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="productDescription" name="description" placeholder="Descripción del producto" style="height: 100px;" required data-testid="textarea-product-description"></textarea>
+                        <label for="productDescription">Descripción</label>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="productPrice" name="price" step="0.01" min="0" placeholder="Precio" required data-testid="input-product-price">
+                                <label for="productPrice">Precio ($)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="productStock" name="stock" min="0" placeholder="Stock" required data-testid="input-product-stock">
+                                <label for="productStock">Stock</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <input type="url" class="form-control" id="productImage" name="image_url" placeholder="URL de la imagen" data-testid="input-product-image">
+                        <label for="productImage">URL de la Imagen (opcional)</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveProduct()" data-testid="button-save-product">
+                    <i class="fas fa-save me-2"></i>Guardar Producto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- scripts = `
+<script src="/js/admin-gauges.js"></script>
+<script>
+// Admin Dashboard JavaScript
+
+// Initialize gauges and dashboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAdminDashboard();
+});
+
+function initializeAdminDashboard() {
+    // Initialize canvas gauges
+    if (typeof createGauge === 'function') {
+        createGauge('serverGauge', 85, 100, '#10B981');
+        createGauge('satisfactionGauge', 92, 100, '#8B5CF6');
+        createGauge('inventoryGauge', ${100 - Math.min((metrics.lowStockCount || 0) * 10, 90)}, 100, '${metrics.lowStockCount > 5 ? '#EF4444' : metrics.lowStockCount > 0 ? '#F59E0B' : '#10B981'}');
+        
+        // Animate gauges periodically
+        setInterval(updateGauges, 5000);
+    }
+
+    // Setup form handlers
+    setupFormHandlers();
+    
+    // Set default dates for promotion form
+    setDefaultPromotionDates();
+}
+
+function setupFormHandlers() {
+    // Promotion form handler
+    const promotionForm = document.getElementById('promotionForm');
+    if (promotionForm) {
+        promotionForm.addEventListener('submit', handleCreatePromotion);
+    }
+}
+
+function setDefaultPromotionDates() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const nextWeek = new Date(now);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    document.getElementById('promoStart').value = formatDateTimeLocal(tomorrow);
+    document.getElementById('promoEnd').value = formatDateTimeLocal(nextWeek);
+}
+
+function formatDateTimeLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return \`\${year}-\${month}-\${day}T\${hours}:\${minutes}\`;
+}
+
+// Promotion Management
+async function handleCreatePromotion(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const promotionData = {
+        title: formData.get('title'),
+        product_id: formData.get('product_id'),
+        discount_percent: formData.get('discount_percent'),
+        starts_at: formData.get('starts_at'),
+        ends_at: formData.get('ends_at')
+    };
+    
+    try {
+        const token = localStorage.getItem('supabase_token');
+        if (!token) {
+            showNotification('Error: No estás autenticado', 'error');
+            return;
+        }
+        
+        const response = await fetch('/api/admin/promotion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': \`Bearer \${token}\`
+            },
+            body: JSON.stringify(promotionData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Promoción creada exitosamente', 'success');
+            e.target.reset();
+            setDefaultPromotionDates();
+            // Reload page to show new promotion
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showNotification(result.message || 'Error al crear promoción', 'error');
+        }
+    } catch (error) {
+        console.error('Error creating promotion:', error);
+        showNotification('Error al crear promoción', 'error');
+    }
+}
+
+async function deletePromotion(promotionId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta promoción?')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('supabase_token');
+        if (!token) {
+            showNotification('Error: No estás autenticado', 'error');
+            return;
+        }
+        
+        const response = await fetch(\`/api/admin/promotion/\${promotionId}\`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': \`Bearer \${token}\`
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Promoción eliminada exitosamente', 'success');
+            // Remove from DOM or reload page
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showNotification(result.message || 'Error al eliminar promoción', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting promotion:', error);
+        showNotification('Error al eliminar promoción', 'error');
+    }
+}
+
+// Product Management
+function showAddProductModal() {
+    document.getElementById('productModalTitle').textContent = 'Nuevo Producto';
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('productModal'));
+    modal.show();
+}
+
+function editProduct(productId) {
+    // In a real implementation, fetch product data and populate form
+    document.getElementById('productModalTitle').textContent = 'Editar Producto';
+    showNotification('Funcionalidad de edición próximamente disponible');
+}
+
+async function saveProduct() {
+    const form = document.getElementById('productForm');
+    const formData = new FormData(form);
+    const productId = formData.get('id');
+    
+    const productData = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: parseFloat(formData.get('price')),
+        stock: parseInt(formData.get('stock')),
+        category: formData.get('category'),
+        image_url: formData.get('image_url') || null
+    };
+    
+    try {
+        const token = localStorage.getItem('supabase_token');
+        if (!token) {
+            showNotification('Error: No estás autenticado', 'error');
+            return;
+        }
+        
+        const url = productId ? \`/api/admin/product/\${productId}\` : '/api/admin/product';
+        const method = productId ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': \`Bearer \${token}\`
+            },
+            body: JSON.stringify(productData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification(\`Producto \${productId ? 'actualizado' : 'creado'} exitosamente\`, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showNotification(result.message || 'Error al guardar producto', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving product:', error);
+        showNotification('Error al guardar producto', 'error');
+    }
+}
+
+async function deleteProduct(productId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('supabase_token');
+        if (!token) {
+            showNotification('Error: No estás autenticado', 'error');
+            return;
+        }
+        
+        const response = await fetch(\`/api/admin/product/\${productId}\`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': \`Bearer \${token}\`
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('Producto eliminado exitosamente', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showNotification(result.message || 'Error al eliminar producto', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        showNotification('Error al eliminar producto', 'error');
+    }
+}
+
+// Utility Functions
+function updateGauges() {
+    // Simulate real-time updates with slight variations
+    const serverPerf = 85 + Math.random() * 10;
+    const satisfaction = 90 + Math.random() * 10;
+    const inventory = ${100 - Math.min((metrics.lowStockCount || 0) * 10, 90)} + Math.random() * 5;
+    
+    if (typeof createGauge === 'function') {
+        createGauge('serverGauge', Math.min(serverPerf, 100), 100, '#10B981');
+        createGauge('satisfactionGauge', Math.min(satisfaction, 100), 100, '#8B5CF6');
+        createGauge('inventoryGauge', Math.min(inventory, 100), 100, inventory > 80 ? '#10B981' : inventory > 60 ? '#F59E0B' : '#EF4444');
+    }
+}
+
+function exportData() {
+    showNotification('Funcionalidad de exportación próximamente disponible');
+}
+
+function openSettings() {
+    showNotification('Panel de configuración próximamente disponible');
+}
+</script>
+` %>

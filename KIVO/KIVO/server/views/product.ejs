@@ -1,0 +1,321 @@
+<% 
+// Set page context for navigation
+let page = 'products';
+let description = `${product.name} - ${product.description.substring(0, 150)}...`;
+%>
+
+<section class="py-5 mt-5">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" data-testid="link-breadcrumb-home">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/products" data-testid="link-breadcrumb-products">Productos</a></li>
+                <li class="breadcrumb-item active" aria-current="page" data-testid="text-breadcrumb-current"><%= product.name %></li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <!-- Product Image -->
+            <div class="col-lg-6 mb-4">
+                <div class="product-image-container">
+                    <% if (product.image_url) { %>
+                    <img src="<%= product.image_url %>" alt="<%= product.name %>" 
+                         class="img-fluid rounded-3 shadow-lg w-100" 
+                         style="max-height: 500px; object-fit: cover;"
+                         data-testid="img-product-main">
+                    <% } else { %>
+                    <div class="bg-light rounded-3 shadow-lg d-flex align-items-center justify-content-center" 
+                         style="height: 500px;"
+                         data-testid="div-product-placeholder">
+                        <i class="fas fa-image fa-5x text-muted"></i>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Product Details -->
+            <div class="col-lg-6">
+                <div class="product-details">
+                    <h1 class="display-5 font-space-grotesk fw-bold mb-3" data-testid="text-product-title">
+                        <%= product.name %>
+                    </h1>
+
+                    <!-- Price and Promotions -->
+                    <div class="mb-4">
+                        <% if (promotions && promotions.length > 0) { %>
+                            <% const bestPromotion = promotions[0]; %>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <span class="text-decoration-line-through text-muted fs-4" data-testid="text-original-price">
+                                    $<%= parseFloat(product.price).toLocaleString() %>
+                                </span>
+                                <span class="display-6 fw-bold text-danger" data-testid="text-discounted-price">
+                                    $<%= (parseFloat(product.price) * (1 - bestPromotion.discount_percent / 100)).toLocaleString() %>
+                                </span>
+                                <span class="badge bg-danger fs-6" data-testid="badge-discount">
+                                    -<%= bestPromotion.discount_percent %>%
+                                </span>
+                            </div>
+                            <div class="alert alert-success" role="alert" data-testid="alert-promotion">
+                                <i class="fas fa-fire me-2"></i>
+                                <strong><%= bestPromotion.title %></strong>
+                                <br>
+                                <small>Válida hasta <%= new Date(bestPromotion.ends_at).toLocaleDateString('es-ES', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %></small>
+                            </div>
+                        <% } else { %>
+                            <span class="display-6 fw-bold" style="color: var(--primary-color);" data-testid="text-regular-price">
+                                $<%= parseFloat(product.price).toLocaleString() %>
+                            </span>
+                        <% } %>
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-box text-muted"></i>
+                            <span class="text-muted">Stock:</span>
+                            <% if (product.stock > 10) { %>
+                                <span class="badge bg-success" data-testid="badge-stock-high">En Stock (<%= product.stock %> disponibles)</span>
+                            <% } else if (product.stock > 0) { %>
+                                <span class="badge bg-warning text-dark" data-testid="badge-stock-low">Últimas unidades (<%= product.stock %> disponibles)</span>
+                            <% } else { %>
+                                <span class="badge bg-danger" data-testid="badge-stock-out">Agotado</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Product Description -->
+                    <div class="mb-4">
+                        <h3 class="h5 mb-3">Descripción</h3>
+                        <p class="text-muted" data-testid="text-product-description">
+                            <%= product.description %>
+                        </p>
+                    </div>
+
+                    <!-- Product Specifications -->
+                    <div class="mb-4">
+                        <h3 class="h5 mb-3">Especificaciones</h3>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="list-unstyled">
+                                    <% if (product.category) { %>
+                                    <li class="mb-2">
+                                        <strong>Categoría:</strong> 
+                                        <span class="text-muted text-capitalize" data-testid="text-product-category">
+                                            <%= product.category %>
+                                        </span>
+                                    </li>
+                                    <% } %>
+                                    <li class="mb-2">
+                                        <strong>SKU:</strong> 
+                                        <span class="text-muted" data-testid="text-product-sku">
+                                            KIVO-<%= product.id %>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <strong>Agregado:</strong> 
+                                        <span class="text-muted" data-testid="text-product-created">
+                                            <%= new Date(product.created_at).toLocaleDateString('es-ES') %>
+                                        </span>
+                                    </li>
+                                    <% if (product.updated_at && product.updated_at !== product.created_at) { %>
+                                    <li class="mb-2">
+                                        <strong>Actualizado:</strong> 
+                                        <span class="text-muted" data-testid="text-product-updated">
+                                            <%= new Date(product.updated_at).toLocaleDateString('es-ES') %>
+                                        </span>
+                                    </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 flex-wrap">
+                        <% if (product.stock > 0) { %>
+                        <button class="btn btn-primary btn-lg" 
+                                onclick="showNotification('Funcionalidad de carrito próximamente disponible')"
+                                data-testid="button-add-to-cart">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Agregar al Carrito
+                        </button>
+                        <button class="btn btn-outline-primary btn-lg"
+                                onclick="showNotification('Funcionalidad de compra próximamente disponible')"
+                                data-testid="button-buy-now">
+                            <i class="fas fa-bolt me-2"></i>
+                            Comprar Ahora
+                        </button>
+                        <% } else { %>
+                        <button class="btn btn-secondary btn-lg" disabled data-testid="button-out-of-stock">
+                            <i class="fas fa-times me-2"></i>
+                            Producto Agotado
+                        </button>
+                        <% } %>
+                        
+                        <button class="btn btn-outline-secondary"
+                                onclick="showNotification('Funcionalidad de favoritos próximamente disponible')"
+                                data-testid="button-add-to-favorites">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        
+                        <button class="btn btn-outline-secondary"
+                                onclick="shareProduct()"
+                                data-testid="button-share-product">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="row text-center">
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-shipping-fast fa-2x text-primary mb-2"></i>
+                                <div class="small text-muted">
+                                    <strong>Envío Gratis</strong><br>
+                                    En compras mayores a $500
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-undo fa-2x text-primary mb-2"></i>
+                                <div class="small text-muted">
+                                    <strong>30 Días</strong><br>
+                                    Garantía de devolución
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
+                                <div class="small text-muted">
+                                    <strong>Compra Segura</strong><br>
+                                    Pagos protegidos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2 class="font-space-grotesk fw-bold mb-4" data-testid="text-related-title">Productos Relacionados</h2>
+                <div id="related-products" class="row g-4" data-testid="div-related-products">
+                    <!-- Related products will be loaded here via JavaScript -->
+                    <div class="col-12 text-center py-5">
+                        <div class="loading-spinner mx-auto"></div>
+                        <p class="text-muted mt-3">Cargando productos relacionados...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Product-specific JavaScript
+function shareProduct() {
+    if (navigator.share) {
+        navigator.share({
+            title: '<%= product.name %>',
+            text: '<%= product.description.substring(0, 100) %>...',
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showNotification('Enlace copiado al portapapeles');
+        }).catch(() => {
+            showNotification('No se pudo compartir el producto');
+        });
+    }
+}
+
+// Load related products
+document.addEventListener('DOMContentLoaded', function() {
+    loadRelatedProducts();
+});
+
+async function loadRelatedProducts() {
+    try {
+        const category = '<%= product.category %>';
+        const currentId = '<%= product.id %>';
+        
+        const response = await fetch(`/api/products?category=${category}&limit=3`);
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            // Filter out current product and limit to 3
+            const relatedProducts = data.data
+                .filter(p => p.id !== currentId)
+                .slice(0, 3);
+            
+            if (relatedProducts.length > 0) {
+                displayRelatedProducts(relatedProducts);
+            } else {
+                showEmptyRelated();
+            }
+        } else {
+            showEmptyRelated();
+        }
+    } catch (error) {
+        console.error('Error loading related products:', error);
+        showEmptyRelated();
+    }
+}
+
+function displayRelatedProducts(products) {
+    const container = document.getElementById('related-products');
+    
+    container.innerHTML = products.map(product => `
+        <div class="col-md-4">
+            <div class="product-card" data-testid="card-related-${product.id}">
+                ${product.image_url ? 
+                    `<img src="${product.image_url}" alt="${product.name}" class="product-image">` :
+                    `<div class="product-image bg-light d-flex align-items-center justify-content-center">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>`
+                }
+                <div class="product-info">
+                    <h5 class="product-title">${product.name}</h5>
+                    <div class="product-price">$${parseFloat(product.price).toLocaleString()}</div>
+                    <p class="product-description">
+                        ${product.description.length > 80 ? 
+                          product.description.substring(0, 80) + '...' : 
+                          product.description}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-box me-1"></i>
+                            ${product.stock} disponibles
+                        </small>
+                        <a href="/product/${product.id}" class="btn btn-primary btn-sm">
+                            Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showEmptyRelated() {
+    const container = document.getElementById('related-products');
+    container.innerHTML = `
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No hay productos relacionados disponibles</p>
+        </div>
+    `;
+}
+</script>

@@ -1,0 +1,170 @@
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 font-space-grotesk fw-bold mb-3" data-testid="heading-products">
+                    Nuestros Productos
+                </h1>
+                <p class="lead text-muted" data-testid="text-products-subtitle">
+                    Descubre nuestra selección de productos de alta calidad
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="GET" class="d-flex gap-3">
+                        <div class="flex-grow-1">
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   name="search" 
+                                   placeholder="Buscar productos..." 
+                                   value="<%= filters.search || '' %>"
+                                   data-testid="input-search">
+                        </div>
+                        
+                        <div>
+                            <select class="form-select form-select-lg" name="category" data-testid="select-category">
+                                <option value="">Todas las categorías</option>
+                                <option value="electronics" <%= filters.category === 'electronics' ? 'selected' : '' %>>Electrónicos</option>
+                                <option value="clothing" <%= filters.category === 'clothing' ? 'selected' : '' %>>Ropa</option>
+                                <option value="home" <%= filters.category === 'home' ? 'selected' : '' %>>Hogar</option>
+                                <option value="books" <%= filters.category === 'books' ? 'selected' : '' %>>Libros</option>
+                                <option value="sports" <%= filters.category === 'sports' ? 'selected' : '' %>>Deportes</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg" data-testid="button-search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        
+                        <% if (filters.search || filters.category) { %>
+                        <a href="/products" class="btn btn-outline-secondary btn-lg" data-testid="button-clear-filters">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        <% } %>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="text-lg-end mt-3 mt-lg-0">
+                <small class="text-muted" data-testid="text-results-count">
+                    <i class="fas fa-box me-1"></i>
+                    <%= products.length %> producto<%= products.length !== 1 ? 's' : '' %> encontrado<%= products.length !== 1 ? 's' : '' %>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <% if (products.length > 0) { %>
+    <div class="row g-4">
+        <% products.forEach((product, index) => { %>
+        <div class="col-lg-4 col-md-6">
+            <div class="product-card h-100" data-testid="card-product-<%= product.id %>">
+                <div class="product-image">
+                    <% if (product.image_url) { %>
+                    <img src="<%= product.image_url %>" 
+                         alt="<%= product.name %>" 
+                         class="w-100"
+                         data-testid="img-product-<%= product.id %>">
+                    <% } else { %>
+                    <div class="placeholder-image d-flex align-items-center justify-content-center">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    <% } %>
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-auto">
+                        <h5 class="card-title font-space-grotesk fw-semibold mb-2" data-testid="text-product-name-<%= product.id %>">
+                            <%= product.name %>
+                        </h5>
+                        
+                        <p class="card-text text-muted mb-3" data-testid="text-product-description-<%= product.id %>">
+                            <%= product.description.length > 100 ? product.description.substring(0, 100) + '...' : product.description %>
+                        </p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="price-display" data-testid="text-product-price-<%= product.id %>">
+                                    $<%= parseFloat(product.price).toLocaleString('es-CO') %>
+                                </span>
+                            </div>
+                            
+                            <div>
+                                <% if (product.stock > 0) { %>
+                                    <% if (product.stock <= 5) { %>
+                                    <small class="text-warning" data-testid="text-stock-low-<%= product.id %>">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        Solo <%= product.stock %> disponible<%= product.stock !== 1 ? 's' : '' %>
+                                    </small>
+                                    <% } else { %>
+                                    <small class="text-success" data-testid="text-stock-available-<%= product.id %>">
+                                        <i class="fas fa-check-circle me-1"></i>Disponible
+                                    </small>
+                                    <% } %>
+                                <% } else { %>
+                                <small class="text-danger" data-testid="text-stock-unavailable-<%= product.id %>">
+                                    <i class="fas fa-times-circle me-1"></i>Agotado
+                                </small>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <% if (product.category) { %>
+                        <div class="mb-3">
+                            <span class="badge bg-light text-dark" data-testid="badge-category-<%= product.id %>">
+                                <%= product.category %>
+                            </span>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="/product/<%= product.id %>" 
+                           class="btn btn-outline-primary"
+                           data-testid="button-view-product-<%= product.id %>">
+                            <i class="fas fa-eye me-2"></i>Ver detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% }); %>
+    </div>
+    <% } else { %>
+    <!-- No Products Found -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-search fa-4x text-muted"></i>
+        </div>
+        
+        <h3 class="font-space-grotesk fw-semibold mb-3" data-testid="heading-no-products">
+            No se encontraron productos
+        </h3>
+        
+        <p class="text-muted mb-4" data-testid="text-no-products-message">
+            <% if (filters.search || filters.category) { %>
+                No hay productos que coincidan con tu búsqueda. Intenta con otros términos o revisa todas las categorías.
+            <% } else { %>
+                Aún no hay productos disponibles en la tienda.
+            <% } %>
+        </p>
+        
+        <% if (filters.search || filters.category) { %>
+        <a href="/products" class="btn btn-primary" data-testid="button-show-all">
+            <i class="fas fa-eye me-2"></i>Ver todos los productos
+        </a>
+        <% } %>
+    </div>
+    <% } %>
+</div>

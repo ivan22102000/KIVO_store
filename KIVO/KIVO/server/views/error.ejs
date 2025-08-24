@@ -1,0 +1,38 @@
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="text-center">
+        <div class="mb-4">
+            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+        </div>
+        
+        <h1 class="display-4 font-space-grotesk fw-bold mb-3" data-testid="heading-error">
+            ¡Oops! Algo salió mal
+        </h1>
+        
+        <p class="lead text-muted mb-4" data-testid="text-error-message">
+            <%= message || 'Ha ocurrido un error inesperado' %>
+        </p>
+        
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="/" class="btn btn-primary btn-lg" data-testid="button-home">
+                <i class="fas fa-home me-2"></i>Volver al inicio
+            </a>
+            
+            <button onclick="window.history.back()" class="btn btn-outline-secondary btn-lg" data-testid="button-back">
+                <i class="fas fa-arrow-left me-2"></i>Volver atrás
+            </button>
+        </div>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="mt-5">
+            <details class="text-start">
+                <summary class="btn btn-sm btn-outline-secondary">Ver detalles técnicos</summary>
+                <div class="mt-3 p-3 bg-white rounded border">
+                    <small class="text-muted font-monospace" data-testid="text-error-details">
+                        <%= error %>
+                    </small>
+                </div>
+            </details>
+        </div>
+        <% } %>
+    </div>
+</div>
