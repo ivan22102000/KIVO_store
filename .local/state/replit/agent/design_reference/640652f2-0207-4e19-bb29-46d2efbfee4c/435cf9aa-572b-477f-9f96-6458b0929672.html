@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIVO - Justo lo que necesitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kivo-purple': '#8B5CF6',
+                        'kivo-light': '#A855F7',
+                        'kivo-dark': '#7C3AED',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'gradient': 'gradient 8s ease infinite',
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'slide-in': 'slideIn 0.6s ease-out',
+                        'scale-in': 'scaleIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-100px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for enhanced animations and effects */
+        .parallax-container {
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            perspective: 1px;
+        }
+        
+        .parallax-element {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        
+        .parallax-back {
+            transform: translateZ(-1px) scale(2);
+        }
+        
+        .parallax-base {
+            transform: translateZ(0);
+        }
+        
+        .product-card-3d {
+            transform-style: preserve-3d;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+        
+        .product-card-3d:hover {
+            transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) scale(1.05);
+            box-shadow: 0 35px 80px -15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .ripple-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-effect::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple-effect:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .gradient-animated {
+            background: linear-gradient(-45deg, #8B5CF6, #A855F7, #EC4899, #06B6D4);
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .countdown-digit {
+            background: linear-gradient(135deg, #8B5CF6, #A855F7);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .countdown-digit:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+        }
+        
+        .floating-notification {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 overflow-x-hidden">
+    <!-- @COMPONENT: Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo with animation -->
+                <div class="flex items-center">
+                    <div class="text-2xl font-bold text-kivo-purple animate-pulse-slow">
+                        <i class="fas fa-store mr-2"></i>KIVO
+                    </div>
+                    <span class="ml-2 text-sm text-gray-600 hidden sm:block">justo lo que necesitas</span>
+                </div>
+                
+                <!-- Navigation links -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-kivo-purple transition-colors duration-300 font-medium">Inicio</a>
+                    <a href="#productos" class="text-gray-700 hover:text-kivo-purple transition-colors duration-300 font-medium">Productos</a>
+                    <a href="#promociones" class="text-gray-700 hover:text-kivo-purple transition-colors duration-300 font-medium">Promociones</a>
+                    <a href="#contacto" class="text-gray-700 hover:text-kivo-purple transition-colors duration-300 font-medium">Contacto</a>
+                </div>
+                
+                <!-- User actions -->
+                <div class="flex items-center space-x-4">
+                    <button class="relative p-2 text-gray-700 hover:text-kivo-purple transition-colors duration-300">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce-slow">3</span>
+                    </button>
+                    <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                        Ingresar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: Navigation -->
+
+    <!-- @COMPONENT: Hero Section with Parallax -->
+    <section class="relative min-h-screen flex items-center justify-center gradient-animated">
+        <div class="absolute inset-0 bg-black opacity-20"></div>
+        <div class="relative z-10 text-center text-white px-4 animate-slide-up">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 text-glow">
+                Tecnología que
+                <span class="block gradient-animated bg-clip-text text-transparent">Inspira</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90 animate-slide-in">
+                Descubre productos premium seleccionados especialmente para ti
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button class="bg-white text-kivo-purple px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-300 ripple-effect transform hover:scale-105 shadow-2xl">
+                    <i class="fas fa-shopping-bag mr-2"></i>
+                    Explorar Productos
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-kivo-purple transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-play mr-2"></i>
+                    Ver Video
+                </button>
+            </div>
+        </div>
+        
+        <!-- Floating elements -->
+        <div class="absolute top-20 left-10 w-20 h-20 bg-white opacity-10 rounded-full animate-float"></div>
+        <div class="absolute bottom-20 right-10 w-32 h-32 bg-white opacity-5 rounded-full animate-float" style="animation-delay: -3s;"></div>
+    </section>
+    <!-- @END_COMPONENT: Hero Section -->
+
+    <!-- @COMPONENT: Promotional Zone with Countdown -->
+    <section id="promociones" class="py-20 bg-gradient-to-r from-kivo-purple to-kivo-light relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-10"></div>
+        
+        <!-- Animated background elements -->
+        <div class="absolute top-0 left-0 w-full h-full">
+            <div class="absolute top-10 left-10 w-40 h-40 bg-white opacity-5 rounded-full animate-pulse-slow"></div>
+            <div class="absolute bottom-10 right-10 w-60 h-60 bg-white opacity-5 rounded-full animate-pulse-slow" style="animation-delay: -2s;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Promotion header -->
+            <div class="text-center mb-12 animate-scale-in">
+                <div class="inline-block bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 animate-bounce-slow floating-notification">
+                    <i class="fas fa-fire mr-2"></i>¡OFERTA LIMITADA!
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 text-glow">
+                    MacBook Pro 14" con 15% OFF
+                </h2>
+                <p class="text-xl text-white opacity-90">
+                    Potencia profesional al mejor precio. ¡Solo por tiempo limitado!
+                </p>
+            </div>
+            
+            <!-- Countdown Timer -->
+            <div class="flex justify-center mb-12">
+                <div class="grid grid-cols-4 gap-4 text-center" data-implementation="Implement real countdown logic with JavaScript">
+                    <div class="countdown-digit text-white p-4 rounded-xl">
+                        <div class="text-3xl md:text-4xl font-bold" data-bind="countdown.days">05</div>
+                        <div class="text-sm opacity-80">DÍAS</div>
+                    </div>
+                    <div class="countdown-digit text-white p-4 rounded-xl">
+                        <div class="text-3xl md:text-4xl font-bold" data-bind="countdown.hours">14</div>
+                        <div class="text-sm opacity-80">HORAS</div>
+                    </div>
+                    <div class="countdown-digit text-white p-4 rounded-xl">
+                        <div class="text-3xl md:text-4xl font-bold" data-bind="countdown.minutes">23</div>
+                        <div class="text-sm opacity-80">MIN</div>
+                    </div>
+                    <div class="countdown-digit text-white p-4 rounded-xl">
+                        <div class="text-3xl md:text-4xl font-bold" data-bind="countdown.seconds">45</div>
+                        <div class="text-sm opacity-80">SEG</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Featured Product -->
+            <div class="bg-white rounded-3xl p-8 shadow-2xl max-w-4xl mx-auto product-card-3d">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <!-- Professional MacBook Pro image showing sleek design -->
+                        <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
+                             alt="MacBook Pro 14 inch" 
+                             class="w-full h-80 object-cover rounded-2xl shadow-lg">
+                    </div>
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold mr-3">-15% OFF</span>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="text-gray-600 ml-2">(127 reseñas)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-4">MacBook Pro 14"</h3>
+                        <p class="text-gray-600 mb-6">Potencia profesional con el chip M2 Pro. Ideal para desarrollo y diseño con una pantalla Liquid Retina XDR espectacular.</p>
+                        
+                        <div class="flex items-center mb-6">
+                            <span class="text-3xl font-bold text-kivo-purple mr-3">$2,124.15</span>
+                            <span class="text-xl text-gray-400 line-through">$2,499.00</span>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button class="bg-kivo-purple text-white px-6 py-3 rounded-xl font-semibold hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105 flex-1">
+                                <i class="fas fa-shopping-cart mr-2"></i>
+                                Agregar al Carrito
+                            </button>
+                            <button class="border-2 border-kivo-purple text-kivo-purple px-6 py-3 rounded-xl font-semibold hover:bg-kivo-purple hover:text-white transition-all duration-300 transform hover:scale-105">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Promotional Zone -->
+
+    <!-- @COMPONENT: Featured Products Carousel -->
+    <section id="productos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                    Productos <span class="text-kivo-purple">Destacados</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Descubre nuestra selección premium de productos tecnológicos cuidadosamente elegidos para ti
+                </p>
+            </div>
+            
+            <!-- Products Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- @MAP: products.map(product => ( -->
+                <!-- Product Card 1 -->
+                <div class="product-card-3d bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:border-kivo-purple transition-all duration-500">
+                    <div class="relative">
+                        <!-- High-quality AirPods Pro image showing premium wireless earbuds -->
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                             alt="AirPods Pro" 
+                             class="w-full h-64 object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Nuevo</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors duration-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">AirPods Pro</h3>
+                        <p class="text-gray-600 mb-4">Cancelación de ruido activa y sonido espacial personalizado.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-kivo-purple">$249.00</span>
+                            <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Card 2 -->
+                <div class="product-card-3d bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:border-kivo-purple transition-all duration-500">
+                    <div class="relative">
+                        <!-- Modern iPhone 15 Pro image showcasing titanium design -->
+                        <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                             alt="iPhone 15 Pro" 
+                             class="w-full h-64 object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Hot</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors duration-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">iPhone 15 Pro</h3>
+                        <p class="text-gray-600 mb-4">El smartphone más avanzado con titanio y cámara de 48MP.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-kivo-purple">$1,199.00</span>
+                            <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Card 3 -->
+                <div class="product-card-3d bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:border-kivo-purple transition-all duration-500">
+                    <div class="relative">
+                        <!-- Minimalist home office setup with clean desk and modern equipment -->
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                             alt="Desk Setup Pro" 
+                             class="w-full h-64 object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Combo</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors duration-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Desk Setup Pro</h3>
+                        <p class="text-gray-600 mb-4">Kit completo para oficina en casa con diseño minimalista.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-kivo-purple">$899.00</span>
+                            <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Card 4 -->
+                <div class="product-card-3d bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:border-kivo-purple transition-all duration-500">
+                    <div class="relative">
+                        <!-- iPad Pro displaying creative design work on screen -->
+                        <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                             alt="iPad Pro 12.9 inch" 
+                             class="w-full h-64 object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Pro</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors duration-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">iPad Pro 12.9"</h3>
+                        <p class="text-gray-600 mb-4">Tablet profesional con chip M2 y soporte para Apple Pencil.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-kivo-purple">$1,399.00</span>
+                            <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Card 5 -->
+                <div class="product-card-3d bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:border-kivo-purple transition-all duration-500">
+                    <div class="relative">
+                        <!-- Apple Watch Series 9 showing fitness tracking features -->
+                        <img src="https://images.unsplash.com/photo-1434493907317-a46b5bbe7834?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                             alt="Apple Watch Series 9" 
+                             class="w-full h-64 object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Health</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors duration-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Apple Watch Series 9</h3>
+                        <p class="text-gray-600 mb-4">El reloj inteligente más avanzado con monitoreo de salud.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-kivo-purple">$449.00</span>
+                            <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Card 6 -->
+                <div class="product-card-3d bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 hover:border-kivo-purple transition-all duration-500">
+                    <div class="relative">
+                        <!-- Modern headphones for music and professional audio -->
+                        <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                             alt="Premium Headphones" 
+                             class="w-full h-64 object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-indigo-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Audio</span>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <button class="bg-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-300">
+                                <i class="fas fa-heart text-gray-400 hover:text-red-500 transition-colors duration-300"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Headphones Pro</h3>
+                        <p class="text-gray-600 mb-4">Audífonos premium con cancelación de ruido y sonido Hi-Fi.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-kivo-purple">$299.00</span>
+                            <button class="bg-kivo-purple text-white px-4 py-2 rounded-lg hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="text-center mt-16">
+                <button class="bg-gradient-to-r from-kivo-purple to-kivo-light text-white px-8 py-4 rounded-full font-semibold text-lg hover:from-kivo-dark hover:to-kivo-purple transition-all duration-300 transform hover:scale-105 shadow-xl">
+                    <i class="fas fa-plus mr-2"></i>
+                    Ver Más Productos
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Featured Products -->
+
+    <!-- @COMPONENT: Stats Section with Animated Counters -->
+    <section class="py-20 gradient-animated">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 text-center text-white">
+                <div class="animate-scale-in">
+                    <div class="text-4xl md:text-5xl font-bold mb-2" data-implementation="Implement counter animation">1,250+</div>
+                    <div class="text-lg opacity-90">Productos Vendidos</div>
+                </div>
+                <div class="animate-scale-in" style="animation-delay: 0.2s;">
+                    <div class="text-4xl md:text-5xl font-bold mb-2" data-implementation="Implement counter animation">850+</div>
+                    <div class="text-lg opacity-90">Clientes Satisfechos</div>
+                </div>
+                <div class="animate-scale-in" style="animation-delay: 0.4s;">
+                    <div class="text-4xl md:text-5xl font-bold mb-2" data-implementation="Implement counter animation">24/7</div>
+                    <div class="text-lg opacity-90">Soporte Técnico</div>
+                </div>
+                <div class="animate-scale-in" style="animation-delay: 0.6s;">
+                    <div class="text-4xl md:text-5xl font-bold mb-2" data-implementation="Implement counter animation">99.9%</div>
+                    <div class="text-lg opacity-90">Tiempo de Actividad</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Stats Section -->
+
+    <!-- @COMPONENT: Newsletter Section -->
+    <section class="py-20 bg-gray-900 relative overflow-hidden">
+        <div class="absolute inset-0">
+            <!-- Tech-themed background with circuit patterns and digital elements -->
+            <img src="https://pixabay.com/get/g7f5305451ddbbbc33c7a82e526faa5758b2e3f2c6558aefcff10231a442ecc666051f961d0ad82c1529a7d1d82d676f35b685f99a0bdbc2ee86bd0334fdb9cd7_1280.jpg" 
+                 alt="Technology background with circuit patterns" 
+                 class="w-full h-full object-cover opacity-20">
+        </div>
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <div class="animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    Mantente al <span class="text-kivo-light">Día</span>
+                </h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Recibe las mejores ofertas y novedades directamente en tu email
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                    <input type="email" 
+                           placeholder="tu@email.com" 
+                           class="flex-1 px-6 py-4 rounded-full border-0 bg-white text-gray-800 focus:ring-4 focus:ring-kivo-purple/50 outline-none transition-all duration-300"
+                           data-implementation="Add email validation">
+                    <button class="bg-kivo-purple text-white px-8 py-4 rounded-full font-semibold hover:bg-kivo-dark transition-all duration-300 ripple-effect transform hover:scale-105 whitespace-nowrap">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Suscribirse
+                    </button>
+                </div>
+                
+                <p class="text-sm text-gray-400 mt-4">
+                    <i class="fas fa-lock mr-1"></i>
+                    Tu email está seguro con nosotros. Sin spam.
+                </p>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: Newsletter -->
+
+    <!-- @COMPONENT: Footer -->
+    <footer class="bg-gray-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-bold text-kivo-purple mb-4">
+                        <i class="fas fa-store mr-2"></i>KIVO
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Tecnología premium al alcance de todos. Descubre productos que inspiran y transforman.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="bg-kivo-purple p-3 rounded-full hover:bg-kivo-dark transition-colors duration-300 transform hover:scale-110">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-kivo-purple p-3 rounded-full hover:bg-kivo-dark transition-colors duration-300 transform hover:scale-110">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-kivo-purple p-3 rounded-full hover:bg-kivo-dark transition-colors duration-300 transform hover:scale-110">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-kivo-purple p-3 rounded-full hover:bg-kivo-dark transition-colors duration-300 transform hover:scale-110">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Productos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">MacBooks</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">iPhones</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">iPads</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Apple Watch</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Accesorios</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Soporte</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Centro de Ayuda</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Contacto</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Garantías</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Devoluciones</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Envíos</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Empresa</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Sobre Nosotros</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Careers</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Privacidad</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Términos</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-kivo-light transition-colors duration-300">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-12 pt-8 text-center">
+                <p class="text-gray-300">
+                    © 2024 KIVO. Todos los derechos reservados. Diseñado con <i class="fas fa-heart text-red-500 mx-1"></i> para la excelencia.
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <!-- @COMPONENT: Floating Action Button -->
+    <button class="fixed bottom-8 right-8 bg-kivo-purple text-white p-4 rounded-full shadow-2xl hover:bg-kivo-dark transition-all duration-300 transform hover:scale-110 z-50 animate-bounce-slow floating-notification">
+        <i class="fas fa-comment-dots text-xl"></i>
+        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center animate-pulse">!</span>
+    </button>
+    <!-- @END_COMPONENT: Floating Action Button -->
+
+    <!-- @COMPONENT: Toast Notification -->
+    <div class="fixed top-20 right-4 z-50 bg-white border border-green-200 rounded-lg shadow-lg p-4 transform translate-x-full transition-transform duration-300 glass-effect" 
+         id="toast-notification" 
+         data-implementation="Implement toast notification system">
+        <div class="flex items-center">
+            <div class="bg-green-500 rounded-full p-1 mr-3">
+                <i class="fas fa-check text-white text-sm"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-gray-800">¡Producto agregado!</p>
+                <p class="text-sm text-gray-600">MacBook Pro añadido al carrito</p>
+            </div>
+            <button class="ml-4 text-gray-400 hover:text-gray-600" onclick="this.parentElement.parentElement.style.transform = 'translateX(100%)'">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Toast Notification -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        
+        (function() {
+            // Countdown Timer Animation
+            // TODO: Replace with real-time countdown connected to promotion end date
+            let countdownElement = {
+                days: document.querySelector('[data-bind="countdown.days"]'),
+                hours: document.querySelector('[data-bind="countdown.hours"]'),
+                minutes: document.querySelector('[data-bind="countdown.minutes"]'),
+                seconds: document.querySelector('[data-bind="countdown.seconds"]')
+            };
+            
+            function updateCountdown() {
+                // Mock countdown - in production, calculate based on actual promotion end date
+                let currentSeconds = parseInt(countdownElement.seconds.textContent);
+                if (currentSeconds > 0) {
+                    countdownElement.seconds.textContent = String(currentSeconds - 1).padStart(2, '0');
+                } else {
+                    countdownElement.seconds.textContent = '59';
+                    let currentMinutes = parseInt(countdownElement.minutes.textContent);
+                    if (currentMinutes > 0) {
+                        countdownElement.minutes.textContent = String(currentMinutes - 1).padStart(2, '0');
+                    }
+                }
+            }
+            
+            // Update countdown every second
+            setInterval(updateCountdown, 1000);
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Parallax scroll effect
+            window.addEventListener('scroll', function() {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('.parallax-element');
+                
+                parallaxElements.forEach(element => {
+                    const speed = element.dataset.speed || 0.5;
+                    const yPos = -(scrolled * speed);
+                    element.style.transform = `translateY(${yPos}px)`;
+                });
+            });
+            
+            // Intersection Observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all animated elements
+            document.querySelectorAll('.animate-slide-up, .animate-slide-in, .animate-scale-in').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(50px)';
+                observer.observe(el);
+            });
+            
+            // Shopping Cart Counter Animation
+            let cartCount = 3;
+            function updateCartCount() {
+                const cartBadge = document.querySelector('.fa-shopping-cart + span');
+                if (cartBadge) {
+                    cartBadge.textContent = cartCount;
+                    cartBadge.classList.add('animate-bounce-slow');
+                }
+            }
+            
+            // Add to cart functionality
+            document.querySelectorAll('button:has(.fa-plus), button:has(.fa-shopping-cart)').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255,255,255,0.6)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = '50%';
+                    ripple.style.top = '50%';
+                    ripple.style.width = '20px';
+                    ripple.style.height = '20px';
+                    ripple.style.marginLeft = '-10px';
+                    ripple.style.marginTop = '-10px';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                    
+                    // Update cart count
+                    cartCount++;
+                    updateCartCount();
+                    
+                    // Show toast notification
+                    showToast();
+                });
+            });
+            
+            // Toast notification function
+            function showToast() {
+                const toast = document.getElementById('toast-notification');
+                if (toast) {
+                    toast.style.transform = 'translateX(0)';
+                    setTimeout(() => {
+                        toast.style.transform = 'translateX(100%)';
+                    }, 3000);
+                }
+            }
+            
+            // CSS Animation for ripple effect
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+        })();
+    </script>
+</body>
+</html>

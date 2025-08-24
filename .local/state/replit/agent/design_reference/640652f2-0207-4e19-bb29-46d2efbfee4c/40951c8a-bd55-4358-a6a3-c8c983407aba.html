@@ -1,0 +1,865 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIVO - Justo lo que necesitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        violet: {
+                            50: '#F5F3FF',
+                            100: '#EDE9FE', 
+                            200: '#DDD6FE',
+                            300: '#C4B5FD',
+                            400: '#A78BFA',
+                            500: '#8B5CF6',
+                            600: '#7C3AED',
+                            700: '#6D28D9',
+                            800: '#5B21B6',
+                            900: '#4C1D95'
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans text-gray-700">
+
+    <!-- @COMPONENT: NavigationHeader -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-violet-600">KIVO</h1>
+                        <p class="text-xs text-gray-500 -mt-1">justo lo que necesitas</p>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#products" class="text-gray-700 hover:text-violet-600 transition-colors duration-200 font-medium">Productos</a>
+                    <a href="#about" class="text-gray-700 hover:text-violet-600 transition-colors duration-200 font-medium">Nosotros</a>
+                    <a href="#contact" class="text-gray-700 hover:text-violet-600 transition-colors duration-200 font-medium">Contacto</a>
+                </nav>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-4">
+                    <!-- Cart -->
+                    <button data-event="click:toggleCart" class="relative p-2 text-gray-700 hover:text-violet-600 transition-colors duration-200">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-violet-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" data-bind="cart.itemCount">3</span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button data-event="click:toggleUserMenu" class="flex items-center space-x-2 text-gray-700 hover:text-violet-600 transition-colors duration-200">
+                            <i class="fas fa-user-circle text-xl"></i>
+                            <span class="hidden sm:block font-medium" data-bind="user.name">Usuario</span>
+                        </button>
+                    </div>
+
+                    <!-- Admin Dashboard Link (when user is admin) -->
+                    <a href="#admin" class="hidden md:inline-flex items-center px-4 py-2 border border-violet-300 rounded-lg text-violet-600 hover:bg-violet-50 transition-colors duration-200 font-medium">
+                        <i class="fas fa-cog mr-2"></i>
+                        Dashboard
+                    </a>
+
+                    <!-- Mobile menu button -->
+                    <button class="md:hidden p-2 text-gray-700 hover:text-violet-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: NavigationHeader -->
+
+    <!-- @COMPONENT: HeroSection -->
+    <section class="bg-gradient-to-br from-violet-50 to-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+                    Justo lo que <span class="text-violet-600">necesitas</span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Descubre productos cuidadosamente seleccionados con la mejor calidad y diseño minimalista.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button data-event="click:scrollToProducts" class="bg-violet-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 shadow-lg">
+                        Ver Productos
+                    </button>
+                    <button data-event="click:showPromotion" class="border-2 border-violet-300 text-violet-600 px-8 py-3 rounded-lg font-semibold hover:bg-violet-50 transition-colors duration-200">
+                        Ofertas Especiales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: HeroSection -->
+
+    <!-- @COMPONENT: FeaturedProducts -->
+    <section id="products" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Productos Destacados</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Selección premium de productos tecnológicos y accesorios para tu estilo de vida.
+                </p>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- @MAP: products.map(product => ( -->
+                <!-- MacBook Pro Product Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- Modern tech workspace with MacBook on a wooden desk -->
+                    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                         alt="MacBook Pro 14 pulgadas" 
+                         class="w-full h-64 object-cover" data-mock-image="true" />
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold text-gray-900" data-bind="product.name">MacBook Pro 14"</h3>
+                            <span class="bg-violet-100 text-violet-600 px-2 py-1 rounded-lg text-sm font-medium">Electronics</span>
+                        </div>
+                        <p class="text-gray-600 mb-4" data-bind="product.description">Potencia profesional con el chip M2 Pro. Ideal para desarrollo y diseño.</p>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-violet-600" data-bind="product.price">$2,499.00</span>
+                            <span class="text-sm text-gray-500" data-bind="product.stock">15 disponibles</span>
+                        </div>
+                        
+                        <button data-event="click:addToCart" data-product-id="macbook-pro" 
+                                class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AirPods Pro Product Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- White AirPods Pro on clean minimalist background -->
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                         alt="AirPods Pro con cancelación de ruido" 
+                         class="w-full h-64 object-cover" data-mock-image="true" />
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold text-gray-900" data-bind="product.name">AirPods Pro</h3>
+                            <span class="bg-violet-100 text-violet-600 px-2 py-1 rounded-lg text-sm font-medium">Electronics</span>
+                        </div>
+                        <p class="text-gray-600 mb-4" data-bind="product.description">Cancelación de ruido activa y sonido espacial personalizado.</p>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-violet-600" data-bind="product.price">$249.00</span>
+                            <span class="text-sm text-gray-500" data-bind="product.stock">8 disponibles</span>
+                        </div>
+                        
+                        <button data-event="click:addToCart" data-product-id="airpods-pro" 
+                                class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- iPhone 15 Pro Product Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- iPhone 15 Pro in modern setting with clean background -->
+                    <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                         alt="iPhone 15 Pro con diseño de titanio" 
+                         class="w-full h-64 object-cover" data-mock-image="true" />
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold text-gray-900" data-bind="product.name">iPhone 15 Pro</h3>
+                            <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded-lg text-sm font-medium">¡Oferta!</span>
+                        </div>
+                        <p class="text-gray-600 mb-4" data-bind="product.description">El smartphone más avanzado con titanio y cámara de 48MP.</p>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-2xl font-bold text-violet-600" data-bind="product.discountPrice">$1,019.15</span>
+                                <span class="text-lg text-gray-400 line-through" data-bind="product.originalPrice">$1,199.00</span>
+                            </div>
+                            <span class="text-sm text-gray-500" data-bind="product.stock">12 disponibles</span>
+                        </div>
+                        
+                        <button data-event="click:addToCart" data-product-id="iphone-15-pro" 
+                                class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desk Setup Pro Product Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- Minimalist desk setup with monitor, keyboard, and plants -->
+                    <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                         alt="Setup de escritorio minimalista completo" 
+                         class="w-full h-64 object-cover" data-mock-image="true" />
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold text-gray-900" data-bind="product.name">Desk Setup Pro</h3>
+                            <span class="bg-green-100 text-green-600 px-2 py-1 rounded-lg text-sm font-medium">Home</span>
+                        </div>
+                        <p class="text-gray-600 mb-4" data-bind="product.description">Kit completo para oficina en casa con diseño minimalista.</p>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-violet-600" data-bind="product.price">$899.00</span>
+                            <span class="text-sm text-gray-500" data-bind="product.stock">5 disponibles</span>
+                        </div>
+                        
+                        <button data-event="click:addToCart" data-product-id="desk-setup" 
+                                class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- iPad Pro Product Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- iPad Pro with Apple Pencil on modern desk -->
+                    <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                         alt="iPad Pro 12.9 pulgadas con Apple Pencil" 
+                         class="w-full h-64 object-cover" data-mock-image="true" />
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold text-gray-900" data-bind="product.name">iPad Pro 12.9"</h3>
+                            <span class="bg-violet-100 text-violet-600 px-2 py-1 rounded-lg text-sm font-medium">Electronics</span>
+                        </div>
+                        <p class="text-gray-600 mb-4" data-bind="product.description">Tablet profesional con chip M2 y soporte para Apple Pencil.</p>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-violet-600" data-bind="product.price">$1,399.00</span>
+                            <span class="text-sm text-gray-500" data-bind="product.stock">7 disponibles</span>
+                        </div>
+                        
+                        <button data-event="click:addToCart" data-product-id="ipad-pro" 
+                                class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Apple Watch Product Card -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                    <!-- Apple Watch Series 9 on wrist showing fitness data -->
+                    <img src="https://images.unsplash.com/photo-1434493907317-a46b5bbe7834?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                         alt="Apple Watch Series 9 con monitoreo de salud" 
+                         class="w-full h-64 object-cover" data-mock-image="true" />
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-semibold text-gray-900" data-bind="product.name">Apple Watch Series 9</h3>
+                            <span class="bg-violet-100 text-violet-600 px-2 py-1 rounded-lg text-sm font-medium">Electronics</span>
+                        </div>
+                        <p class="text-gray-600 mb-4" data-bind="product.description">El reloj inteligente más avanzado con monitoreo de salud.</p>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-2xl font-bold text-violet-600" data-bind="product.price">$449.00</span>
+                            <span class="text-sm text-gray-500" data-bind="product.stock">20 disponibles</span>
+                        </div>
+                        
+                        <button data-event="click:addToCart" data-product-id="apple-watch" 
+                                class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button data-event="click:loadMoreProducts" 
+                        class="bg-gray-100 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200">
+                    Ver Más Productos
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: FeaturedProducts -->
+
+    <!-- @COMPONENT: AdminDashboard (visible when user is admin) -->
+    <section id="admin" class="py-20 bg-gray-50" style="display: none;" data-admin-only="true">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Administrativo</h2>
+                <p class="text-gray-600">Panel de control y métricas en tiempo real</p>
+            </div>
+
+            <!-- Metrics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Ventas Totales</p>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="dashboard.totalSales">$24,563</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">+12.5%</span>
+                        <span class="text-gray-500 ml-1">vs mes anterior</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Órdenes</p>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="dashboard.totalOrders">147</p>
+                        </div>
+                        <div class="bg-violet-100 p-3 rounded-lg">
+                            <i class="fas fa-shopping-bag text-violet-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">+8.2%</span>
+                        <span class="text-gray-500 ml-1">vs mes anterior</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Productos</p>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="dashboard.totalProducts">67</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="fas fa-cube text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">+3</span>
+                        <span class="text-gray-500 ml-1">nuevos este mes</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Usuarios</p>
+                            <p class="text-2xl font-bold text-gray-900" data-bind="dashboard.totalUsers">892</p>
+                        </div>
+                        <div class="bg-orange-100 p-3 rounded-lg">
+                            <i class="fas fa-users text-orange-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-600 font-medium">+15.3%</span>
+                        <span class="text-gray-500 ml-1">vs mes anterior</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Gauges Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Sales Performance Gauge -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Rendimiento de Ventas</h3>
+                    <div class="flex flex-col items-center">
+                        <canvas id="salesGauge" width="200" height="200" class="mb-4"></canvas>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-violet-600" data-bind="dashboard.salesPerformance">85%</p>
+                            <p class="text-sm text-gray-500">de la meta mensual</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Status Gauge -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Estado de Inventario</h3>
+                    <div class="flex flex-col items-center">
+                        <canvas id="inventoryGauge" width="200" height="200" class="mb-4"></canvas>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-green-600" data-bind="dashboard.inventoryStatus">92%</p>
+                            <p class="text-sm text-gray-500">productos en stock</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Satisfaction Gauge -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Satisfacción del Cliente</h3>
+                    <div class="flex flex-col items-center">
+                        <canvas id="satisfactionGauge" width="200" height="200" class="mb-4"></canvas>
+                        <div class="text-center">
+                            <p class="text-2xl font-bold text-blue-600" data-bind="dashboard.customerSatisfaction">96%</p>
+                            <p class="text-sm text-gray-500">calificación promedio</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <button data-event="click:addProduct" 
+                            class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-plus-circle text-violet-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Agregar Producto</span>
+                    </button>
+                    
+                    <button data-event="click:manageInventory" 
+                            class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-boxes text-blue-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Gestionar Inventario</span>
+                    </button>
+                    
+                    <button data-event="click:viewOrders" 
+                            class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-receipt text-green-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Ver Órdenes</span>
+                    </button>
+                    
+                    <button data-event="click:createPromotion" 
+                            class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-tag text-orange-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Crear Promoción</span>
+                    </button>
+                    
+                    <button data-event="click:exportData" 
+                            class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-download text-gray-600 text-2xl mb-2"></i>
+                        <span class="text-sm font-medium text-gray-700">Exportar Datos</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- @END_COMPONENT: AdminDashboard -->
+
+    <!-- @COMPONENT: LoginModal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Iniciar Sesión</h2>
+                <p class="text-gray-600">Accede a tu cuenta de KIVO</p>
+            </div>
+
+            <form data-event="submit:handleLogin" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors duration-200"
+                           placeholder="tu@email.com" data-mock="true">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors duration-200"
+                           placeholder="••••••••" data-mock="true">
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded">
+                        <span class="ml-2 text-sm text-gray-600">Recordarme</span>
+                    </label>
+                    <a href="#" class="text-sm text-violet-600 hover:text-violet-700">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">¿No tienes cuenta? 
+                    <a href="#" data-event="click:showRegister" class="text-violet-600 hover:text-violet-700 font-medium">Regístrate aquí</a>
+                </p>
+            </div>
+
+            <button data-event="click:closeModal" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LoginModal -->
+
+    <!-- @COMPONENT: CartSidebar -->
+    <div id="cartSidebar" class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50" style="display: none;">
+        <div class="flex flex-col h-full">
+            <!-- Cart Header -->
+            <div class="border-b border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Carrito de Compras</h3>
+                    <button data-event="click:closeCart" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-gray-500 mt-1" data-bind="cart.itemCount">3 productos</p>
+            </div>
+
+            <!-- Cart Items -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- @MAP: cartItems.map(item => ( -->
+                <div class="flex items-center space-x-4 py-4 border-b border-gray-100">
+                    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" 
+                         alt="MacBook Pro en carrito" 
+                         class="w-16 h-16 object-cover rounded-lg" data-mock-image="true" />
+                    
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900" data-bind="item.name">MacBook Pro 14"</h4>
+                        <p class="text-sm text-gray-500" data-bind="item.price">$2,499.00</p>
+                        
+                        <div class="flex items-center mt-2">
+                            <button data-event="click:decreaseQuantity" class="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="mx-3 font-medium" data-bind="item.quantity">1</span>
+                            <button data-event="click:increaseQuantity" class="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button data-event="click:removeFromCart" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="border-t border-gray-200 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-lg font-semibold text-gray-900">Total:</span>
+                    <span class="text-2xl font-bold text-violet-600" data-bind="cart.total">$2,747.00</span>
+                </div>
+                
+                <button data-event="click:proceedToCheckout" 
+                        class="w-full bg-violet-600 text-white py-3 rounded-lg font-semibold hover:bg-violet-700 transition-colors duration-200 mb-3">
+                    Proceder al Pago
+                </button>
+                
+                <button data-event="click:continueShopping" 
+                        class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">
+                    Continuar Comprando
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: CartSidebar -->
+
+    <!-- @COMPONENT: Footer -->
+    <footer class="bg-white border-t border-gray-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold text-violet-600">KIVO</h2>
+                        <p class="text-sm text-gray-500">justo lo que necesitas</p>
+                    </div>
+                    <p class="text-gray-600 mb-4 max-w-md">
+                        Tu tienda online de confianza para productos tecnológicos y accesorios de alta calidad con diseño minimalista.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-violet-600 transition-colors duration-200">
+                            <i class="fab fa-facebook-f text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-violet-600 transition-colors duration-200">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-violet-600 transition-colors duration-200">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-violet-600 transition-colors duration-200">
+                            <i class="fab fa-linkedin-in text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-4">Enlaces Rápidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#products" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Productos</a></li>
+                        <li><a href="#about" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Nosotros</a></li>
+                        <li><a href="#contact" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Contacto</a></li>
+                        <li><a href="#support" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Soporte</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-4">Soporte</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#faq" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">FAQ</a></li>
+                        <li><a href="#shipping" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Envíos</a></li>
+                        <li><a href="#returns" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Devoluciones</a></li>
+                        <li><a href="#privacy" class="text-gray-600 hover:text-violet-600 transition-colors duration-200">Privacidad</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 mt-8 pt-8 text-center">
+                <p class="text-gray-500">
+                    © 2024 KIVO. Todos los derechos reservados. | Diseñado con 💜 para estudiantes
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- @END_COMPONENT: Footer -->
+
+    <!-- @COMPONENT: NotificationToast -->
+    <div id="toast" class="fixed top-4 right-4 bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 transform translate-x-full transition-transform duration-300 z-50" style="display: none;">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-gray-900" data-bind="toast.message">Producto agregado al carrito</p>
+            </div>
+            <button data-event="click:closeToast" class="ml-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: NotificationToast -->
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, and state management
+            
+            // Canvas Gauge Drawing Functions
+            function drawGauge(canvasId, percentage, color) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = 80;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw background circle
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#E5E7EB';
+                ctx.lineWidth = 12;
+                ctx.stroke();
+                
+                // Draw progress arc
+                const startAngle = -Math.PI / 2;
+                const endAngle = startAngle + (percentage / 100) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 12;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                
+                // Draw center circle
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+            
+            // Animate gauges
+            function animateGauges() {
+                const gauges = [
+                    { id: 'salesGauge', target: 85, color: '#8B5CF6' },
+                    { id: 'inventoryGauge', target: 92, color: '#10B981' },
+                    { id: 'satisfactionGauge', target: 96, color: '#3B82F6' }
+                ];
+                
+                gauges.forEach(gauge => {
+                    let current = 0;
+                    const increment = gauge.target / 60; // Animation duration
+                    
+                    const animate = () => {
+                        if (current < gauge.target) {
+                            current += increment;
+                            drawGauge(gauge.id, Math.min(current, gauge.target), gauge.color);
+                            requestAnimationFrame(animate);
+                        }
+                    };
+                    
+                    animate();
+                });
+            }
+            
+            // Initialize gauges when admin section is visible
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const adminSection = document.getElementById('admin');
+                        if (adminSection && adminSection.style.display !== 'none') {
+                            setTimeout(animateGauges, 100);
+                        }
+                    }
+                });
+            });
+            
+            const adminSection = document.getElementById('admin');
+            if (adminSection) {
+                observer.observe(adminSection, { attributes: true });
+            }
+            
+            // Initialize gauges if admin section is already visible
+            if (adminSection && adminSection.style.display !== 'none') {
+                setTimeout(animateGauges, 100);
+            }
+            
+            // Modal and UI interactions
+            const loginModal = document.getElementById('loginModal');
+            const cartSidebar = document.getElementById('cartSidebar');
+            const toast = document.getElementById('toast');
+            
+            // Show/hide login modal
+            window.toggleLoginModal = function() {
+                if (loginModal) {
+                    loginModal.style.display = loginModal.style.display === 'none' ? 'flex' : 'none';
+                }
+            };
+            
+            // Show/hide cart sidebar
+            window.toggleCartSidebar = function() {
+                if (cartSidebar) {
+                    if (cartSidebar.style.display === 'none') {
+                        cartSidebar.style.display = 'block';
+                        setTimeout(() => {
+                            cartSidebar.classList.remove('translate-x-full');
+                        }, 10);
+                    } else {
+                        cartSidebar.classList.add('translate-x-full');
+                        setTimeout(() => {
+                            cartSidebar.style.display = 'none';
+                        }, 300);
+                    }
+                }
+            };
+            
+            // Show toast notification
+            window.showToast = function(message) {
+                if (toast) {
+                    const messageElement = toast.querySelector('[data-bind="toast.message"]');
+                    if (messageElement) {
+                        messageElement.textContent = message;
+                    }
+                    toast.style.display = 'block';
+                    setTimeout(() => {
+                        toast.classList.remove('translate-x-full');
+                    }, 10);
+                    
+                    // Auto-hide after 3 seconds
+                    setTimeout(() => {
+                        toast.classList.add('translate-x-full');
+                        setTimeout(() => {
+                            toast.style.display = 'none';
+                        }, 300);
+                    }, 3000);
+                }
+            };
+            
+            // Show admin dashboard (for demo purposes)
+            window.showAdminDashboard = function() {
+                const adminSection = document.getElementById('admin');
+                if (adminSection) {
+                    adminSection.style.display = 'block';
+                    adminSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+            
+            // Sample event handlers for demonstration
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                
+                if (target.closest('[data-event*="addToCart"]')) {
+                    e.preventDefault();
+                    showToast('Producto agregado al carrito');
+                }
+                
+                if (target.closest('[data-event*="toggleCart"]')) {
+                    e.preventDefault();
+                    toggleCartSidebar();
+                }
+                
+                if (target.closest('[data-event*="toggleUserMenu"]')) {
+                    e.preventDefault();
+                    toggleLoginModal();
+                }
+                
+                if (target.closest('[data-event*="closeModal"]') || target.closest('[data-event*="closeCart"]') || target.closest('[data-event*="closeToast"]')) {
+                    e.preventDefault();
+                    if (loginModal && loginModal.style.display !== 'none') {
+                        toggleLoginModal();
+                    }
+                    if (cartSidebar && cartSidebar.style.display !== 'none') {
+                        toggleCartSidebar();
+                    }
+                    if (toast && toast.style.display !== 'none') {
+                        toast.classList.add('translate-x-full');
+                        setTimeout(() => {
+                            toast.style.display = 'none';
+                        }, 300);
+                    }
+                }
+                
+                if (target.closest('a[href="#admin"]')) {
+                    e.preventDefault();
+                    showAdminDashboard();
+                }
+                
+                if (target.closest('[data-event*="scrollToProducts"]')) {
+                    e.preventDefault();
+                    document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+            
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target === loginModal) {
+                    toggleLoginModal();
+                }
+            });
+            
+            // Responsive menu handling
+            const mobileMenuButton = document.querySelector('.md\\:hidden button');
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    // TODO: Implement mobile menu toggle
+                    showToast('Menú móvil - Por implementar');
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
